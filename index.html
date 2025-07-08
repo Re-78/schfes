@@ -10,10 +10,22 @@
 .my-table td {
   border: 1px solid #999;
 }
+.field {
+    display:flex;
+justify-content: space-around;
+}
+body {
+  background-color: rgba(102, 205, 170, 0.5);
+}
+.object{
+    background-color: rgba(255, 192, 203, 0.5);
+}
 </style>
   </head>
   <body>
-<h2>商品一覧</h2>
+<div class="field">
+<div>
+<h2><mark>商品一覧</mark></h2>
     <ol>
         <li><b><font color="red">黒糖ミルク</font></b>(¥100-)</li>
         <li><b><font color="red">抹茶黒糖ミルク</font></b>(¥150-)</li>
@@ -23,22 +35,39 @@
   <tr><th></th><th>黒糖ミルク</th><th>抹茶黒糖ミルク</th><th>抹茶ミルク</th><th>合計</th></tr>
   <tr><th>個数</th><td class="fpnumber">0</td><td class="spnumber">0</td><td class="tpnumber">0</td><td class="topnumber">0</td></tr>
   <tr><th>金額</th><td class="fmnumber">0</td><td class="smnumber">0</td><td class="tmnumber">0</td><td class="tomnumber">0</td></tr>
-</table>
-<form id="my-form">
+</table><br>
+   <h3>
+<p>黒糖ミルク　　 ：
+<progress id="prog1" max="150" min="0" value="0"></progress>
+  ：<output id="status1">0</output>％</p>
+<p>抹茶黒糖ミルク ：
+<progress id="prog2" max="150" min="0" value="0"></progress>
+  ：<output id="status2">0</output>％</p>
+<p>抹茶ミルク　　 ：
+<progress id="prog3" max="150" min="0" value="0"></progress>
+  ：<output id="status3">0</output>％</p>
+ </h3>
+    </div>
+    <div>
+    <form id="my-form">
     <p>黒糖ミルク</p>
-<button type="button" onclick="updateItem('k', true)">追加</button>
-<button type="button" onclick="updateItem('k', false)">取り消し</button><br>
+<button type="button" onclick="updateItem('k', true)" class="object">追加</button>
+<button type="button" onclick="updateItem('k', false)" class="object">取り消し</button><br>
     <p>抹茶黒糖ミルク</p>
-<button type="button" onclick="updateItem('mk', true)">追加</button>
-<button type="button" onclick="updateItem('mk', false)">取り消し</button><br>
+<button type="button" onclick="updateItem('mk', true)" class="object">追加</button>
+<button type="button" onclick="updateItem('mk', false)" class="object">取り消し</button><br>
     <p>抹茶ミルク</p>
-<button type="button" onclick="updateItem('m', true)">追加</button>
-<button type="button" onclick="updateItem('m', false)">取り消し</button>
-    </form><br><br><br>
-<input type="number" name="number" value=0 id="fedit"><br>
-<input type="number" name="number" value=0 id="sedit"> <br>
-<input type="number" name="number" value=0 id="tedit"><br>
-<button type="button" onclick="edit()">edit</button>
+<button type="button" onclick="updateItem('m', true)" class="object">追加</button>
+<button type="button" onclick="updateItem('m', false)" class="object">取り消し</button>
+</form>
+  </div>
+ <div>
+<input type="number" name="number" value=0 id="fedit" class="object"><br>
+<input type="number" name="number" value=0 id="sedit" class="object"> <br>
+<input type="number" name="number" value=0 id="tedit" class="object"><br>
+<button type="button" onclick="edit()" class="object">edit</button>
+ </div>
+  </div>
     <script>
   const form = document.getElementById('my-form');
   const fprice = 100;
@@ -49,6 +78,23 @@ const items = {
   mk: { index: 2, price: 150 },
   m: { index: 3, price: 302 },
 };
+function updateProgress() {
+  const tbl = document.getElementById('my-table');
+  const max = 150;
+
+  const kQty = Number(tbl.rows[1].cells[1].innerText);
+  const mkQty = Number(tbl.rows[1].cells[2].innerText);
+  const mQty = Number(tbl.rows[1].cells[3].innerText);
+
+  document.getElementById("prog1").value = kQty;
+  document.getElementById("prog2").value = mkQty;
+  document.getElementById("prog3").value = mQty;
+
+  document.getElementById("status1").innerText = Math.round((kQty / max) * 100);
+  document.getElementById("status2").innerText = Math.round((mkQty / max) * 100);
+  document.getElementById("status3").innerText = Math.round((mQty / max) * 100);
+}
+
 function updateItem(itemKey, isAdd) {
   const tbl = document.getElementById('my-table');
   const { index, price } = items[itemKey];
@@ -59,10 +105,12 @@ function updateItem(itemKey, isAdd) {
   let totalAmt = Number(tbl.rows[2].cells[4].innerText);
 
   if (isAdd) {
+    if (quantity < 150) {
     quantity++;
     amount += price;
     totalQty++;
     totalAmt += price;
+}
   } else if (quantity > 0) {
     quantity--;
     amount -= price;
@@ -75,6 +123,7 @@ function updateItem(itemKey, isAdd) {
   tbl.rows[1].cells[4].innerText = totalQty;
   tbl.rows[2].cells[4].innerText = totalAmt;
     localStorage.setItem(index, amount);
+    updateProgress();
 }
  function edit() {
     const result = prompt("password");
@@ -97,6 +146,7 @@ function updateItem(itemKey, isAdd) {
 }else{
  return;
 }
+updateProgress();
 }
   const fdata = localStorage.getItem("1");
   if (fdata) {
@@ -130,22 +180,12 @@ function updateItem(itemKey, isAdd) {
   }
 function updateTotals() {
   const tbl = document.getElementById('my-table');
-
-  const qty1 = Number(tbl.rows[1].cells[1].innerText);
-  const qty2 = Number(tbl.rows[1].cells[2].innerText);
-  const qty3 = Number(tbl.rows[1].cells[3].innerText);
-
-  const amt1 = Number(tbl.rows[2].cells[1].innerText);
-  const amt2 = Number(tbl.rows[2].cells[2].innerText);
-  const amt3 = Number(tbl.rows[2].cells[3].innerText);
-
-  const totalQty = qty1 + qty2 + qty3;
-  const totalAmt = amt1 + amt2 + amt3;
-
-  tbl.rows[1].cells[4].innerText = totalQty;
-  tbl.rows[2].cells[4].innerText = totalAmt;
+    
+  tbl.rows[1].cells[4].innerText = Number(tbl.rows[1].cells[1].innerText) + Number(tbl.rows[1].cells[2].innerText) + Number(tbl.rows[1].cells[3].innerText);
+  tbl.rows[2].cells[4].innerText = Number(tbl.rows[2].cells[1].innerText) + Number(tbl.rows[2].cells[2].innerText) + Number(tbl.rows[2].cells[3].innerText);
 }
 updateTotals();
+updateProgress();
 </script>
   </body>
 </html>
