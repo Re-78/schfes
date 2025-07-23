@@ -21,16 +21,15 @@ body {
     background-color: rgba(255, 192, 203, 0.5);
 }
 </style>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   </head>
   <body>
 <div class="field">
 <div>
-<h1><mark>商品一覧</mark></h1>
+<h2><mark>商品一覧</mark></h2>
     <ol>
-        <li><b><font color="red">黒糖ミルク</font></b>(¥100-)</li>
-        <li><b><font color="red">抹茶黒糖ミルク</font></b>(¥150-)</li>
-        <li><b><font color="red">抹茶ミルク</font></b>(¥302-)</li>
+        <li><b><font color="red">黒糖ミルク</font></b>(¥350-)</li>
+        <li><b><font color="red">抹茶黒糖ミルク</font></b>(¥350-)</li>
+        <li><b><font color="red">抹茶ミルク</font></b>(¥350-)</li>
     </ol>
 <table class="my-table" id="my-table">
   <tr><th></th><th>黒糖ミルク</th><th>抹茶黒糖ミルク</th><th>抹茶ミルク</th><th>合計</th></tr>
@@ -66,18 +65,19 @@ body {
 <input type="number" name="number" value=0 id="fedit" class="object"><br>
 <input type="number" name="number" value=0 id="sedit" class="object"> <br>
 <input type="number" name="number" value=0 id="tedit" class="object"><br>
-<button type="button" onclick="edit()" class="object">edit</button>
+<button type="button" onclick="edit()" class="object">edit</button><br><br>
+<button onclick="sendToGoogleSheets()" class="object">Google Sheets に送信</button>
  </div>
   </div>
     <script>
   const form = document.getElementById('my-form');
-  const fprice = 100;
-  const sprice = 150;
-  const tprice = 302;
+  const fprice = 350;
+  const sprice = 350;
+  const tprice = 350;
 const items = {
-  k: { index: 1, price: 100 },
-  mk: { index: 2, price: 150 },
-  m: { index: 3, price: 302 },
+  k: { index: 1, price: 350 },
+  mk: { index: 2, price: 350 },
+  m: { index: 3, price: 350 },
 };
 function updateProgress() {
   const tbl = document.getElementById('my-table');
@@ -95,6 +95,30 @@ function updateProgress() {
   document.getElementById("status2").innerText = Math.round((mkQty / max) * 100);
   document.getElementById("status3").innerText = Math.round((mQty / max) * 100);
 }
+
+function sendToGoogleSheets() {
+  const tbl = document.getElementById('my-table');
+  const payload = {
+    kokutouQty: Number(tbl.rows[1].cells[1].innerText),
+    macchaKokutouQty: Number(tbl.rows[1].cells[2].innerText),
+    macchaQty: Number(tbl.rows[1].cells[3].innerText),
+    totalQty: Number(tbl.rows[1].cells[4].innerText),
+    kokutouAmt: Number(tbl.rows[2].cells[1].innerText),
+    macchaKokutouAmt: Number(tbl.rows[2].cells[2].innerText),
+    macchaAmt: Number(tbl.rows[2].cells[3].innerText),
+    totalAmt: Number(tbl.rows[2].cells[4].innerText)
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbwoIpaH_40bT6vs4aJzNcpRTRX30NDqnOAmM0D1m6EWB7JnhH3q7_Pbdf-XiazqhTem/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.text())
+  .then(txt => alert("送信完了：" + txt))
+  .catch(err => alert("送信失敗: " + err));
+}
+
 
 function updateItem(itemKey, isAdd) {
   const tbl = document.getElementById('my-table');
