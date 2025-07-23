@@ -66,11 +66,9 @@ body {
 <input type="number" name="number" value=0 id="sedit" class="object"> <br>
 <input type="number" name="number" value=0 id="tedit" class="object"><br>
 <button type="button" onclick="edit()" class="object">edit</button><br><br>
-<button onclick="sendData()">Google Sheets に送信</button>
  </div>
   </div>
     <script>
-   const SHEETS_URL = "https://script.google.com/macros/s/AKfycbz5UNadv8pwWuGU1YZ1_Vuct6JOEFAS-KfrtYAL4yvCCUlkWteYOVf-_aF7OKaY-LK9/exec";
   const form = document.getElementById('my-form');
   const fprice = 350;
   const sprice = 350;
@@ -96,47 +94,6 @@ function updateProgress() {
   document.getElementById("status2").innerText = Math.round((mkQty / max) * 100);
   document.getElementById("status3").innerText = Math.round((mQty / max) * 100);
 }
-
-function sendData() {
-  const tbl = document.getElementById('my-table');
-  const k = Number(tbl.rows[1].cells[1].innerText);
-  const mk = Number(tbl.rows[1].cells[2].innerText);
-  const m = Number(tbl.rows[1].cells[3].innerText);
-
-  const params = new URLSearchParams({
-    kokutouQty: k,
-    macchaKokutouQty: mk,
-    macchaQty: m,
-    totalQty: k + mk + m,
-    kokutouAmt: k * 350,
-    macchaKokutouAmt: mk * 350,
-    macchaAmt: m * 350,
-    totalAmt: (k + mk + m) * 350
-  });
-
-  fetch("https://script.google.com/macros/s/AKfycbz5UNadv8pwWuGU1YZ1_Vuct6JOEFAS-KfrtYAL4yvCCUlkWteYOVf-_aF7OKaY-LK9/exec?" + params.toString())
-    .then(res => res.text())
-    .then(txt => alert("送信完了：" + txt))
-    .catch(err => alert("送信失敗: " + err));
-}
-      /*function doGet(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("シート1");
-  
-  sheet.appendRow([
-    new Date(),
-    e.parameter.kokutouQty,
-    e.parameter.macchaKokutouQty,
-    e.parameter.macchaQty,
-    e.parameter.totalQty,
-    e.parameter.kokutouAmt,
-    e.parameter.macchaKokutouAmt,
-    e.parameter.macchaAmt,
-    e.parameter.totalAmt
-  ]);
-  
-  return ContentService.createTextOutput("Success").setMimeType(ContentService.MimeType.TEXT);
-}
-*/
 
 function updateItem(itemKey, isAdd) {
   const tbl = document.getElementById('my-table');
