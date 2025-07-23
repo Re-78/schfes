@@ -66,10 +66,11 @@ body {
 <input type="number" name="number" value=0 id="sedit" class="object"> <br>
 <input type="number" name="number" value=0 id="tedit" class="object"><br>
 <button type="button" onclick="edit()" class="object">edit</button><br><br>
-<button onclick="sendToGoogleSheets()" class="object">Google Sheets に送信</button>
+<button onclick="sendData()">Google Sheets に送信</button>
  </div>
   </div>
     <script>
+   const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxVwbGI3eyQOgBaRFveVfolMq0dRy7zt4Mw-C7LXE5n4556Ak1zFF4W2JtVdI2rCYIP/exec";
   const form = document.getElementById('my-form');
   const fprice = 350;
   const sprice = 350;
@@ -96,23 +97,32 @@ function updateProgress() {
   document.getElementById("status3").innerText = Math.round((mQty / max) * 100);
 }
 
-function sendToGoogleSheets() {
-  const tbl = document.getElementById('my-table');
-  const payload = {
-    kokutouQty: Number(tbl.rows[1].cells[1].innerText),
-    macchaKokutouQty: Number(tbl.rows[1].cells[2].innerText),
-    macchaQty: Number(tbl.rows[1].cells[3].innerText),
-    totalQty: Number(tbl.rows[1].cells[4].innerText),
-    kokutouAmt: Number(tbl.rows[2].cells[1].innerText),
-    macchaKokutouAmt: Number(tbl.rows[2].cells[2].innerText),
-    macchaAmt: Number(tbl.rows[2].cells[3].innerText),
-    totalAmt: Number(tbl.rows[2].cells[4].innerText)
-  };
+    function sendData() {
+      const k = Number(document.getElementById("k").value);
+      const mk = Number(document.getElementById("mk").value);
+      const m = Number(document.getElementById("m").value);
 
-  fetch("https://script.google.com/macros/s/AKfycbwoIpaH_40bT6vs4aJzNcpRTRX30NDqnOAmM0D1m6EWB7JnhH3q7_Pbdf-XiazqhTem/exec", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+      const payload = {
+        kokutouQty: k,
+        macchaKokutouQty: mk,
+        macchaQty: m,
+        totalQty: k + mk + m,
+        kokutouAmt: k * 350,
+        macchaKokutouAmt: mk * 350,
+        macchaAmt: m * 350,
+        totalAmt: (k + mk + m) * 350
+      };
+
+      fetch(SHEETS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.text())
+      .then(txt => alert("送信完了：" + txt))
+      .catch(err => alert("送信失敗: " + err));
+    }
+
   })
   .then(res => res.text())
   .then(txt => alert("送信完了：" + txt))
